@@ -66,8 +66,9 @@ public enum PagePreviewNamespace {
                     }
             }
             .frame(width: scaledPageSize?.width, height: scaledPageSize?.height)
-            .padding(5)
+            .padding(10)
             .background(Color.white)
+            .border(Color.gray, width: 1)
         }
     }
     
