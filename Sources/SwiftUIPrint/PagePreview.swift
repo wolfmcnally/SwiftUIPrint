@@ -29,7 +29,12 @@ public enum PagePreviewNamespace {
         
         @State private var pageDimension: CGSize?
         @State private var myDimension: CGSize?
-        
+
+        public init(page: Page, pageSize: Binding<CGSize>) {
+            self.page = page
+            self._pageSize = pageSize
+        }
+
         var content: some View {
             page
                 .environment(\.colorScheme, .light)

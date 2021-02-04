@@ -15,7 +15,11 @@ public func presentPrintInteractionController<Page>(page: Page) where Page: View
 
 public struct SamplePrintSetup<Page>: View where Page: View {
     public let page: Page
-    
+
+    public init(page: Page) {
+        self.page = page
+    }
+
     public var body: some View {
         VStack {
             Button {

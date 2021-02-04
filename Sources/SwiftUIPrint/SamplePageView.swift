@@ -1,6 +1,8 @@
 import SwiftUI
 
 public struct SamplePageView: View {
+    public init() { }
+    
     public var body: some View {
         ZStack {
             Circle()
