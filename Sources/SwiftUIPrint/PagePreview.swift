@@ -8,17 +8,9 @@ public enum PagePreviewNamespace {
         static var defaultValue: CGSize?
         
         static func reduce(value: inout CGSize?, nextValue: () -> CGSize?) {
-            guard let n = nextValue() else { return }
-            value = n
-        }
-    }
-    
-    struct PageSize: PreferenceKey {
-        static var defaultValue: CGSize?
-        
-        static func reduce(value: inout CGSize?, nextValue: () -> CGSize?) {
-            guard let n = nextValue() else { return }
-            value = n
+            let n = nextValue()
+            guard let next = n else { return }
+            value = next
         }
     }
     
@@ -27,8 +19,7 @@ public enum PagePreviewNamespace {
         
         @Binding var pageSize: CGSize
         
-        @State private var pageDimension: CGSize?
-        @State private var myDimension: CGSize?
+        @State private var viewSize: CGSize?
 
         public init(page: Page, pageSize: Binding<CGSize>) {
             self.page = page
@@ -37,48 +28,46 @@ public enum PagePreviewNamespace {
 
         var content: some View {
             page
+                .frame(width: pageSize.width, height: pageSize.height)
                 .environment(\.colorScheme, .light)
+                .scaleEffect(pageScale ?? 1)
         }
 
-        var pageScale: CGFloat {
-            guard let pageDimension = pageDimension, let myDimension = myDimension else { return 1 }
-            let hScale = myDimension.width / pageDimension.width
-            let vScale = myDimension.height / pageDimension.height
+        var pageScale: CGFloat? {
+            guard
+                let viewSize = viewSize,
+                viewSize.width > 0,
+                viewSize.height > 0
+            else { return nil }
+            
+            let hScale = viewSize.width / pageSize.width
+            let vScale = viewSize.height / pageSize.height
             return min(hScale, vScale)
         }
         
         var scaledPageSize: CGSize? {
-            guard let pageDimension = pageDimension else { return nil }
-            return CGSize(width: pageDimension.width * pageScale, height: pageDimension.height * pageScale)
+            guard let pageScale = pageScale else { return nil }
+            return CGSize(width: pageSize.width * pageScale, height: pageSize.height * pageScale)
         }
         
         public var body: some View {
-            GeometryReader { viewProxy in
-                ZStack(alignment: .topLeading) {
-                    Rectangle()
-                        .background(GeometryReader { p in
-                            Color.clear
-                                .preference(key: ViewSize.self, value: viewProxy.size)
-                        })
-                        .frame(width: scaledPageSize?.width, height: scaledPageSize?.height)
-                    content
-                        .frame(width: pageSize.width, height: pageSize.height)
-                        .background(GeometryReader { pageProxy in
-                            Color.white
-                                .preference(key: PageSize.self, value: pageProxy.size)
-                        })
-                        .scaleEffect(pageScale, anchor: .zero)
-                }
+            GeometryReader { proxy in
+                Rectangle()
+                    .fill(Color.clear)
+                    .background(GeometryReader { p in
+                        Color.clear
+                            .preference(key: ViewSize.self, value: p.size)
+                    })
+                    .overlay(
+                        content
+                    )
+                    .onPreferenceChange(ViewSize.self) {
+                        viewSize = $0
+                    }
             }
             .frame(width: scaledPageSize?.width, height: scaledPageSize?.height)
-            .border(Color.black, width: 1)
-            .clipped()
-            .onPreferenceChange(PageSize.self) {
-                pageDimension = $0
-            }
-            .onPreferenceChange(ViewSize.self) {
-                myDimension = $0
-            }
+            .padding(5)
+            .background(Color.white)
         }
     }
     
