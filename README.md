@@ -32,7 +32,7 @@ In the Simulator our view looks like this:
 
 ![](images/1.jpg)
 
-Now, let's say you want a button that *prints* this view to any printer. Ahh, not so fast! There's currently no simple way out of the box for SwiftUI to do that. This package, **SwiftUIPrint**, makes it easy to print a SwiftUI view using scalable resolution.
+Now, let's say you want a button that *prints* this view to any printer. Ahh, not so fast! There's currently no simple way out of the box for SwiftUI to do that. **SwiftUIPrint** makes it easy to print a SwiftUI view using scalable resolution.
 
 **SwiftUIPrint** provides a `PagePreview` so you can display your view as a thumbnail in roughly the aspect it will be printed. Here's the code for that:
 
@@ -54,14 +54,10 @@ Notice that not only is the background white, but the text is also black and *no
 From here it's just a small step to setting up a view that shows the preview of the view you give it, lets you adjust any settings you require, and launches the actual printing workflow:
 
 ```swift
-public struct PrintSetup<Page>: View where Page: View {
-    public let page: Page
+struct PrintSetup<Page>: View where Page: View {
+    let page: Page
 
-    public init(page: Page) {
-        self.page = page
-    }
-
-    public var body: some View {
+    var body: some View {
         VStack {
             Button {
                 presentPrintInteractionController(page: page)
