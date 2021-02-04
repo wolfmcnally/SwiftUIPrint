@@ -21,7 +21,7 @@ public struct SamplePrintSetup<Page>: View where Page: View {
     }
 
     public var body: some View {
-        VStack {
+        VStack(spacing: 20) {
             Button {
                 presentPrintInteractionController(page: page)
             } label: {
