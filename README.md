@@ -1,3 +1,5 @@
 # SwiftUIPrint
 
-A description of this package.
+## Affordances for printing views laid out using SwiftUI.
+
+by Wolf McNally
