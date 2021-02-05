@@ -95,6 +95,8 @@ And when the Print button is tapped:
 
 ![](images/4.jpg)
 
-The resulting output will be at full printer (PDF) resolution.
+The resulting output will be at retina resolution, which looks great on most printers.
+
+**⚠️ Note:** This technique depends on having SwiftUI render itself into a CoreGraphics context. This does *not* give you as much flexibility as rendering to a CGContext yourself. For instance, if instead of going straight to a printer you export to PDF instead, then any Text views you render using this method will still end up being bitmapped graphic objects in any PDF you export, and not actual text.
 
 🐺

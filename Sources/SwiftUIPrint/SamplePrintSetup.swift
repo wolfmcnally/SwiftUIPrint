@@ -7,12 +7,6 @@
 
 import SwiftUI
 
-public func presentPrintInteractionController<Page>(page: Page) where Page: View {
-    let printController = UIPrintInteractionController()
-    printController.printPageRenderer = PageRenderer(page: page)
-    printController.present(animated: true, completionHandler: nil)
-}
-
 public struct SamplePrintSetup<Page>: View where Page: View {
     public let page: Page
 

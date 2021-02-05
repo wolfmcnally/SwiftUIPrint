@@ -16,14 +16,15 @@ public enum PagePreviewNamespace {
     
     public struct Preview<Page>: View where Page: View {
         let page: Page
-        
         @Binding var pageSize: CGSize
+        @Binding var marginsWidth: CGFloat
         
         @State private var viewSize: CGSize?
 
-        public init(page: Page, pageSize: Binding<CGSize>) {
+        public init(page: Page, pageSize: Binding<CGSize>, marginsWidth: Binding<CGFloat> = .constant(10)) {
             self.page = page
             self._pageSize = pageSize
+            self._marginsWidth = marginsWidth
         }
 
         var content: some View {
@@ -66,7 +67,7 @@ public enum PagePreviewNamespace {
                     }
             }
             .frame(width: scaledPageSize?.width, height: scaledPageSize?.height)
-            .padding(10)
+            .padding(marginsWidth)
             .background(Color.white)
             .border(Color.gray, width: 1)
         }
