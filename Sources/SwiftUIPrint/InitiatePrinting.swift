@@ -12,16 +12,26 @@ public enum PageFitting {
     case fitToPaper
 }
 
-public func presentPrintInteractionController<Page>(page: Page, fitting: PageFitting = .fitToPrintableRect, completion: ((Result<Void, Error>) -> Void)? = nil) where Page: View {
+public enum PrintingResult {
+    case success
+    case failure(Error)
+    case userCancelled
+}
+
+public func presentPrintInteractionController<Page>(page: Page, fitting: PageFitting = .fitToPrintableRect, completion: ((PrintingResult) -> Void)? = nil) where Page: View {
     let printController = UIPrintInteractionController()
     printController.printPageRenderer = PageRenderer(page: page, fitting: fitting)
     printController.present(animated: true) { _, completed, error in
         guard let completion = completion else { return }
         //completion(.failure(NSError(domain: "Mock", code: 42, userInfo: [NSLocalizedDescriptionKey : "The toast burnt."])))
         if completed {
-            completion(.success(()))
+            completion(.success)
         } else {
-            completion(.failure(error!))
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.userCancelled)
+            }
         }
     }
 }
