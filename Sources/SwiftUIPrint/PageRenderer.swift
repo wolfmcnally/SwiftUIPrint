@@ -16,33 +16,40 @@ public class PageRenderer<Page>: UIPrintPageRenderer where Page: View {
     
     override open func drawPage(at pageIndex: Int, in printableRect: CGRect) {
         let context = UIGraphicsGetCurrentContext()!
-        context.saveGState()
-        defer { context.restoreGState() }
-                
+        
         DispatchQueue.main.sync {
             let frame: CGRect
+            let yOffset: CGFloat
             switch fitting {
             case .fitToPrintableRect:
                 frame = printableRect
+                yOffset = 0
             case .fitToPaper:
                 frame = paperRect
+                yOffset = printableRect.minY
             }
-            
+
+            context.saveGState()
+            defer { context.restoreGState() }
+
             let pdfData = page
                 .environment(\.colorScheme, .light)
                 .frame(width: frame.width, height: frame.height)
                 .pdfData(size: frame.size)
 
-            context.translateBy(x: 0, y: paperRect.height)
+            context.translateBy(x: 0, y: frame.height)
             context.scaleBy(x: 1, y: -1)
 
             let dataProvider = CGDataProvider(data: pdfData as CFData)!
             let pdfDoc = CGPDFDocument(dataProvider)!
             let pdfPage = pdfDoc.page(at: 1)!
 
-            context.translateBy(x: frame.minX, y: frame.minY)
+            context.translateBy(x: frame.minX, y: yOffset)
             context.drawPDFPage(pdfPage)
         }
+
+        //drawCrossedBox(in: context, frame: paperRect, color: .blue)
+        //drawCrossedBox(in: context, frame: printableRect, color: .red)
     }
 }
 

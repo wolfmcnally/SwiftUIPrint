@@ -17,7 +17,7 @@ public struct SamplePrintSetup<Page>: View where Page: View {
     public var body: some View {
         VStack(spacing: 20) {
             Button {
-                presentPrintInteractionController(page: page)
+                presentPrintInteractionController(page: page, fitting: .fitToPrintableRect)
             } label: {
                 Label("Print", systemImage: "printer")
                     .padding()
