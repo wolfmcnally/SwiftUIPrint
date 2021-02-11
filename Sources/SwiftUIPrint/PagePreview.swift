@@ -21,7 +21,7 @@ public enum PagePreviewNamespace {
         
         @State private var viewSize: CGSize?
 
-        public init(page: Page, pageSize: Binding<CGSize>, marginsWidth: Binding<CGFloat> = .constant(10)) {
+        public init(page: Page, pageSize: Binding<CGSize>, marginsWidth: Binding<CGFloat> = .constant(0)) {
             self.page = page
             self._pageSize = pageSize
             self._marginsWidth = marginsWidth

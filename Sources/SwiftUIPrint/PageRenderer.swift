@@ -1,6 +1,7 @@
 import SwiftUI
 import UIKit
 import Dispatch
+import PDFKit
 
 public class PageRenderer<Page>: UIPrintPageRenderer where Page: View {
     public let page: Page
@@ -16,46 +17,44 @@ public class PageRenderer<Page>: UIPrintPageRenderer where Page: View {
     
     override open func drawPage(at pageIndex: Int, in printableRect: CGRect) {
         let context = UIGraphicsGetCurrentContext()!
+        context.translateBy(x: 0, y: paperRect.height)
+        context.scaleBy(x: 1, y: -1)
+
+        // print("paperRect: \(paperRect), printableRect: \(printableRect)")
         
-        DispatchQueue.main.sync {
-            let frame: CGRect
-            let yOffset: CGFloat
-            switch fitting {
-            case .fitToPrintableRect:
-                frame = printableRect
-                yOffset = 0
-            case .fitToPaper:
-                frame = paperRect
-                yOffset = printableRect.minY
-            }
-
-            context.saveGState()
-            defer { context.restoreGState() }
-
-            let pdfData = page
+        let frame: CGRect
+        switch fitting {
+        case .fitToPrintableRect:
+            frame = printableRect
+        case .fitToPaper:
+            frame = paperRect
+        }
+        
+//        let image = DispatchQueue.main.sync {
+//            page
+//                .environment(\.colorScheme, .light)
+//                .frame(width: frame.width, height: frame.height)
+//                .image(in: CGRect(origin: CGPoint(x: 0, y: 20), size: frame.size))
+//        }
+//        context.draw(image.cgImage!, in: frame)
+        
+        let pdfPage = DispatchQueue.main.sync {
+            page
                 .environment(\.colorScheme, .light)
                 .frame(width: frame.width, height: frame.height)
-                .pdfData(size: frame.size)
-
-            context.translateBy(x: 0, y: frame.height)
-            context.scaleBy(x: 1, y: -1)
-
-            let dataProvider = CGDataProvider(data: pdfData as CFData)!
-            let pdfDoc = CGPDFDocument(dataProvider)!
-            let pdfPage = pdfDoc.page(at: 1)!
-
-            context.translateBy(x: frame.minX, y: yOffset)
-            context.drawPDFPage(pdfPage)
+                .pdfPage(in: CGRect(origin: CGPoint(x: 0, y: 20), size: frame.size))
         }
+        context.translateBy(x: frame.minX, y: frame.minY)
+        context.drawPDFPage(pdfPage)
 
-        //drawCrossedBox(in: context, frame: paperRect, color: .blue)
-        //drawCrossedBox(in: context, frame: printableRect, color: .red)
+//         drawCrossedBox(in: context, frame: paperRect, color: .blue)
+//         drawCrossedBox(in: context, frame: printableRect, color: .red)
     }
 }
 
 #if DEBUG
 
-func drawCrossedBox(in context: CGContext, frame r: CGRect, color: UIColor) {
+func drawCrossedBox(in context: CGContext, frame r: CGRect, color: UIColor, lineWidth: CGFloat = 1) {
     context.saveGState()
     defer { context.restoreGState() }
     
@@ -74,6 +73,7 @@ func drawCrossedBox(in context: CGContext, frame r: CGRect, color: UIColor) {
     context.closePath()
     
     context.setStrokeColor(color.cgColor)
+    context.setLineWidth(lineWidth)
     context.strokePath()
 }
 
