@@ -8,11 +8,16 @@
 import SwiftUI
 
 public struct SamplePrintSetup<Page>: View where Page: View {
-    public let page: Page
-    @State private var isFitToPrintable: Bool = false
+    public let pages: [Page]
+    @State private var pageIndex = 0
+    @State private var isFitToPrintable = false
 
+    public init(pages: [Page]) {
+        self.pages = pages
+    }
+    
     public init(page: Page) {
-        self.page = page
+        self.init(pages: [page])
     }
 
     public var body: some View {
@@ -23,7 +28,7 @@ public struct SamplePrintSetup<Page>: View where Page: View {
         return VStack(spacing: 20) {
             Toggle("Fit to Printable", isOn: $isFitToPrintable)
             Button {
-                presentPrintInteractionController(page: page, fitting: isFitToPrintable ? .fitToPrintableRect : .fitToPaper)
+                presentPrintInteractionController(pages: pages, fitting: isFitToPrintable ? .fitToPrintableRect : .fitToPaper)
             } label: {
                 Label("Print", systemImage: "printer")
                     .padding()
@@ -32,7 +37,24 @@ public struct SamplePrintSetup<Page>: View where Page: View {
                             .stroke(lineWidth: 2.0)
                     )
             }
-            PagePreview(page: page, pageSize: .constant(CGSize(width: 8.5 * 72 - margins.wrappedValue * 2, height: 11 * 72 - margins.wrappedValue * 2)), marginsWidth: margins)
+            PagePreview(page: pages[pageIndex], pageSize: .constant(CGSize(width: 8.5 * 72 - margins.wrappedValue * 2, height: 11 * 72 - margins.wrappedValue * 2)), marginsWidth: margins)
+            
+            HStack {
+                Button {
+                    pageIndex -= 1
+                } label: {
+                    Image(systemName: "arrowtriangle.left.fill")
+                }
+                .disabled(pageIndex == 0)
+                Text("\(pageIndex + 1) of \(pages.count)")
+                Button {
+                    pageIndex += 1
+                } label: {
+                    Image(systemName: "arrowtriangle.right.fill")
+                }
+                .disabled(pageIndex == pages.count - 1)
+            }
+            .font(.title)
             
             Spacer()
         }

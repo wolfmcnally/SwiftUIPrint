@@ -4,16 +4,20 @@ import Dispatch
 import PDFKit
 
 public class PageRenderer<Page>: UIPrintPageRenderer where Page: View {
-    public let page: Page
+    public let pages: [Page]
     public let fitting: PageFitting
     
-    public init(page: Page, fitting: PageFitting) {
-        self.page = page
+    public init(pages: [Page], fitting: PageFitting) {
+        self.pages = pages
         self.fitting = fitting
         super.init()
     }
     
-    override open var numberOfPages: Int { 1 }
+    public convenience init(page: Page, fitting: PageFitting) {
+        self.init(pages: [page], fitting: fitting)
+    }
+
+    override open var numberOfPages: Int { pages.count }
     
     override open func drawPage(at pageIndex: Int, in printableRect: CGRect) {
         let context = UIGraphicsGetCurrentContext()!
@@ -30,16 +34,8 @@ public class PageRenderer<Page>: UIPrintPageRenderer where Page: View {
             frame = paperRect
         }
         
-//        let image = DispatchQueue.main.sync {
-//            page
-//                .environment(\.colorScheme, .light)
-//                .frame(width: frame.width, height: frame.height)
-//                .image(in: CGRect(origin: CGPoint(x: 0, y: 20), size: frame.size))
-//        }
-//        context.draw(image.cgImage!, in: frame)
-        
         let pdfPage = DispatchQueue.main.sync {
-            page
+            pages[pageIndex]
                 .environment(\.colorScheme, .light)
                 .frame(width: frame.width, height: frame.height)
                 .pdfPage(in: CGRect(origin: CGPoint(x: 0, y: 20), size: frame.size))

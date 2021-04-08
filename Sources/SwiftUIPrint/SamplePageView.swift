@@ -1,16 +1,23 @@
 import SwiftUI
 
 public struct SamplePageView: View {
-    public init() { }
+    let pageNumber: Int
+    
+    public init(pageNumber: Int = 1) {
+        self.pageNumber = pageNumber
+    }
     
     public var body: some View {
         ZStack {
             Circle()
                 .inset(by: 2.5)
                 .stroke(Color.blue, lineWidth: 5)
-            Text("Hello, world!")
-                .padding()
-                .background(Color.orange)
+            VStack {
+                Text("Hello, world!")
+                Text("Page \(pageNumber)")
+            }
+            .padding()
+            .background(Color.orange)
         }
         .background(
             Color.clear

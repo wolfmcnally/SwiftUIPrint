@@ -18,9 +18,9 @@ public enum PrintingResult {
     case userCancelled
 }
 
-public func presentPrintInteractionController<Page>(page: Page, fitting: PageFitting = .fitToPrintableRect, completion: ((PrintingResult) -> Void)? = nil) where Page: View {
+public func presentPrintInteractionController<Page>(pages: [Page], fitting: PageFitting = .fitToPrintableRect, completion: ((PrintingResult) -> Void)? = nil) where Page: View {
     let printController = UIPrintInteractionController()
-    printController.printPageRenderer = PageRenderer(page: page, fitting: fitting)
+    printController.printPageRenderer = PageRenderer(pages: pages, fitting: fitting)
     printController.present(animated: true) { _, completed, error in
         guard let completion = completion else { return }
         //completion(.failure(NSError(domain: "Mock", code: 42, userInfo: [NSLocalizedDescriptionKey : "The toast burnt."])))
@@ -34,4 +34,8 @@ public func presentPrintInteractionController<Page>(page: Page, fitting: PageFit
             }
         }
     }
+}
+
+public func presentPrintInteractionController<Page>(page: Page, fitting: PageFitting = .fitToPrintableRect, completion: ((PrintingResult) -> Void)? = nil) where Page: View {
+    presentPrintInteractionController(pages: [page], fitting: fitting, completion: completion)
 }
