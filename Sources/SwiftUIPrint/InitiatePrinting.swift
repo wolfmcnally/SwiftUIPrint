@@ -18,8 +18,13 @@ public enum PrintingResult {
     case userCancelled
 }
 
-public func presentPrintInteractionController<Page>(pages: [Page], fitting: PageFitting = .fitToPrintableRect, completion: ((PrintingResult) -> Void)? = nil) where Page: View {
+public func presentPrintInteractionController<Page>(pages: [Page], jobName: String? = nil, fitting: PageFitting = .fitToPrintableRect, completion: ((PrintingResult) -> Void)? = nil) where Page: View {
     let printController = UIPrintInteractionController()
+    let printInfo = UIPrintInfo.printInfo()
+    if let jobName = jobName {
+        printInfo.jobName = jobName
+    }
+    printController.printInfo = printInfo
     printController.printPageRenderer = PageRenderer(pages: pages, fitting: fitting)
     printController.present(animated: true) { _, completed, error in
         guard let completion = completion else { return }
