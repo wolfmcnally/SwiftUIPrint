@@ -1,78 +1,91 @@
 import SwiftUI
 
-public typealias PagePreview = PagePreviewNamespace.Preview
-
-public enum PagePreviewNamespace {
+struct ViewSize: PreferenceKey {
+    static var defaultValue: CGSize?
     
-    struct ViewSize: PreferenceKey {
-        static var defaultValue: CGSize?
-        
-        static func reduce(value: inout CGSize?, nextValue: () -> CGSize?) {
-            let n = nextValue()
-            guard let next = n else { return }
-            value = next
-        }
+    static func reduce(value: inout CGSize?, nextValue: () -> CGSize?) {
+        value = nextValue()
+        print("value: \(String(describing: value))")
+        //            let n = nextValue()
+        //            guard let next = n else { return }
+        //            value = next
+    }
+}
+
+public struct PagePreview<Page>: View where Page: View {
+    let page: Page
+    let pageSize: CGSize
+    @Binding var marginsWidth: CGFloat
+    
+    @State private var viewSize: CGSize?
+    @State private var pageScale: Double?
+    @State private var scaledPageSize: CGSize?
+    @State private var contentSize: CGSize?
+    
+    public init(page: Page, pageSize: CGSize, marginsWidth: Binding<CGFloat> = .constant(0)) {
+        self._marginsWidth = marginsWidth
+        self.page = page
+        self.pageSize = pageSize
+        self.scaledPageSize = nil
     }
     
-    public struct Preview<Page>: View where Page: View {
-        let page: Page
-        @Binding var pageSize: CGSize
-        @Binding var marginsWidth: CGFloat
-        
-        @State private var viewSize: CGSize?
-
-        public init(page: Page, pageSize: Binding<CGSize>, marginsWidth: Binding<CGFloat> = .constant(0)) {
-            self.page = page
-            self._pageSize = pageSize
-            self._marginsWidth = marginsWidth
+    func updateSize() {
+        self.scaledPageSize = nil
+        self.pageScale = nil
+        guard
+            let viewSize = viewSize,
+            viewSize.width > 0,
+            viewSize.height > 0
+        else {
+            return
         }
-
-        var content: some View {
-            page
-                .frame(width: pageSize.width, height: pageSize.height)
-                .environment(\.colorScheme, .light)
-                .scaleEffect(pageScale ?? 1)
-        }
-
-        var pageScale: CGFloat? {
-            guard
-                let viewSize = viewSize,
-                viewSize.width > 0,
-                viewSize.height > 0
-            else { return nil }
-            
-            let hScale = viewSize.width / pageSize.width
-            let vScale = viewSize.height / pageSize.height
-            return min(hScale, vScale)
-        }
-        
-        var scaledPageSize: CGSize? {
-            guard let pageScale = pageScale else { return nil }
-            return CGSize(width: pageSize.width * pageScale, height: pageSize.height * pageScale)
-        }
-        
-        public var body: some View {
-            GeometryReader { proxy in
-                Rectangle()
-                    .fill(Color.clear)
-                    .background(GeometryReader { p in
-                        Color.clear
-                            .preference(key: ViewSize.self, value: p.size)
-                    })
-                    .overlay(
-                        content
-                    )
-                    .onPreferenceChange(ViewSize.self) {
-                        viewSize = $0
-                    }
-            }
-            .frame(width: scaledPageSize?.width, height: scaledPageSize?.height)
-            .padding(marginsWidth)
-            .background(Color.white)
-            .border(Color.gray, width: 1)
-        }
+        let pageDimensionsScale = CGVector(
+            dx: viewSize.width / pageSize.width,
+            dy: viewSize.height / pageSize.height
+        )
+        let pageScale = min(pageDimensionsScale.dx, pageDimensionsScale.dy)
+        self.pageScale = pageScale
+        self.scaledPageSize = CGSize(
+            width: pageScale * pageSize.width,
+            height: pageScale * pageSize.height
+        )
+        self.contentSize = CGSize(
+            width: pageSize.width - marginsWidth * 2,
+            height: pageSize.height - marginsWidth * 2
+        )
     }
     
+    public var content: some View {
+        page
+            .environment(\.colorScheme, .light)
+            .scaleEffect(pageScale ?? 1)
+            .frame(width: contentSize?.width, height: contentSize?.height)
+    }
+    
+    public var body: some View {
+        ZStack {
+            Rectangle()
+                .fill(Color.clear)
+                .background(GeometryReader { p in
+                    Color.clear
+                        .preference(key: ViewSize.self, value: p.size)
+                })
+                .onPreferenceChange(ViewSize.self) {
+                    viewSize = $0
+                    updateSize()
+                }
+                .background(
+                    Rectangle()
+                        .fill(Color.white)
+                        .frame(width: scaledPageSize?.width, height: scaledPageSize?.height)
+                        .border(Color.gray, width: 1)
+                )
+                .overlay(content)
+        }
+        .onChange(of: marginsWidth) { _ in
+            updateSize()
+        }
+    }
 }
 
 #if DEBUG
@@ -83,7 +96,7 @@ struct PagePreview_Previews: PreviewProvider {
     }
     
     static var previews: some View {
-        PagePreview(page: content, pageSize: .constant(CGSize(width: 8.5 * 72, height: 11 * 72)))
+        PagePreview(page: content, pageSize: CGSize(width: 8.5 * 72, height: 11 * 72))
             .preferredColorScheme(.dark)
     }
 }

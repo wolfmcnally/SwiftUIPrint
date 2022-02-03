@@ -8,16 +8,18 @@
 import SwiftUI
 
 public struct SamplePrintSetup<Page>: View where Page: View {
+    public let jobName: String?
     public let pages: [Page]
     @State private var pageIndex = 0
     @State private var isFitToPrintable = false
 
-    public init(pages: [Page]) {
+    public init(jobName: String? = nil, pages: [Page]) {
+        self.jobName = jobName
         self.pages = pages
     }
     
-    public init(page: Page) {
-        self.init(pages: [page])
+    public init(jobName: String? = nil, page: Page) {
+        self.init(jobName: jobName, pages: [page])
     }
 
     public var body: some View {
@@ -37,7 +39,7 @@ public struct SamplePrintSetup<Page>: View where Page: View {
                             .stroke(lineWidth: 2.0)
                     )
             }
-            PagePreview(page: pages[pageIndex], pageSize: .constant(CGSize(width: 8.5 * 72 - margins.wrappedValue * 2, height: 11 * 72 - margins.wrappedValue * 2)), marginsWidth: margins)
+            PagePreview(page: pages[pageIndex], pageSize: CGSize(width: 8.5 * 72, height: 11 * 72), marginsWidth: margins)
             
             HStack {
                 Button {

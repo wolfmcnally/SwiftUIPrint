@@ -1,11 +1,11 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.5
 
 import PackageDescription
 
 let package = Package(
     name: "SwiftUIPrint",
     platforms: [
-        .iOS(.v14), .macOS(.v11)
+        .iOS(.v15), .macOS(.v12)
     ],
     products: [
         .library(

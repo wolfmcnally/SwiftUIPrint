@@ -2,7 +2,8 @@ import SwiftUI
 
 public extension View {
     // Must be called on the main thread.
-    func uiView(in frame: CGRect) -> UIView {
+    func uiView(size: CGSize) -> UIView {
+        let frame = CGRect(origin: CGPoint(x: 50, y: 50), size: size)
         let window = UIWindow(frame: frame)
         let hosting = UIHostingController(rootView: self)
         hosting.view.frame = window.frame
@@ -12,38 +13,38 @@ public extension View {
         return hosting.view
     }
     
-    func image(in frame: CGRect) -> UIImage {
+    func image(size: CGSize) -> UIImage {
         self
-            .uiView(in: frame)
+            .uiView(size: size)
             .image
     }
     
-    func pdfPage(in frame: CGRect) -> CGPDFPage {
-        self
-            .uiView(in: frame)
-            .pdfPage
-    }
+//    func pdfPage(size: CGSize) -> CGPDFPage {
+//        self
+//            .uiView(size: size)
+//            .pdfPage
+//    }
 }
 
 public extension UIView {
     var image: UIImage {
-        UIGraphicsBeginImageContextWithOptions(bounds.size, true, 0)
+        UIGraphicsBeginImageContextWithOptions(bounds.size, true, 2)
         defer { UIGraphicsEndImageContext() }
         let context = UIGraphicsGetCurrentContext()!
         layer.render(in: context)
         return UIGraphicsGetImageFromCurrentImageContext()!
     }
     
-    var pdfPage: CGPDFPage {
-        let pdfRenderer = UIGraphicsPDFRenderer(bounds: bounds)
-
-        let pdfData = pdfRenderer.pdfData { rendererContext in
-            rendererContext.beginPage()
-            let cgContext = rendererContext.cgContext
-            layer.render(in: cgContext)
-        }
-        let dataProvider = CGDataProvider(data: pdfData as CFData)!
-        let pdfDoc = CGPDFDocument(dataProvider)!
-        return pdfDoc.page(at: 1)!
-    }
+//    var pdfPage: CGPDFPage {
+//        let pdfRenderer = UIGraphicsPDFRenderer(bounds: bounds)
+//
+//        let pdfData = pdfRenderer.pdfData { rendererContext in
+//            rendererContext.beginPage()
+//            let cgContext = rendererContext.cgContext
+//            layer.render(in: cgContext)
+//        }
+//        let dataProvider = CGDataProvider(data: pdfData as CFData)!
+//        let pdfDoc = CGPDFDocument(dataProvider)!
+//        return pdfDoc.page(at: 1)!
+//    }
 }

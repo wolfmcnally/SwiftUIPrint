@@ -16,14 +16,18 @@ public class PageRenderer<Page>: UIPrintPageRenderer where Page: View {
     public convenience init(page: Page, fitting: PageFitting) {
         self.init(pages: [page], fitting: fitting)
     }
-
+    
     override open var numberOfPages: Int { pages.count }
     
     override open func drawPage(at pageIndex: Int, in printableRect: CGRect) {
         let context = UIGraphicsGetCurrentContext()!
+        
+        context.setFillColor(UIColor.white.cgColor)
+        context.fill(paperRect)
+        
         context.translateBy(x: 0, y: paperRect.height)
         context.scaleBy(x: 1, y: -1)
-
+        
         // print("paperRect: \(paperRect), printableRect: \(printableRect)")
         
         let frame: CGRect
@@ -34,17 +38,17 @@ public class PageRenderer<Page>: UIPrintPageRenderer where Page: View {
             frame = paperRect
         }
         
-        let pdfPage = DispatchQueue.main.sync {
+        let image = DispatchQueue.main.sync {
             pages[pageIndex]
+                .background(.white)
                 .environment(\.colorScheme, .light)
                 .frame(width: frame.width, height: frame.height)
-                .pdfPage(in: CGRect(origin: CGPoint(x: 0, y: 20), size: frame.size))
+                .image(size: frame.size)
         }
-        context.translateBy(x: frame.minX, y: frame.minY)
-        context.drawPDFPage(pdfPage)
-
-//         drawCrossedBox(in: context, frame: paperRect, color: .blue)
-//         drawCrossedBox(in: context, frame: printableRect, color: .red)
+        context.draw(image.cgImage!, in: frame)
+        
+//        drawCrossedBox(in: context, frame: paperRect, color: .red)
+//        drawCrossedBox(in: context, frame: printableRect, color: .green)
     }
 }
 

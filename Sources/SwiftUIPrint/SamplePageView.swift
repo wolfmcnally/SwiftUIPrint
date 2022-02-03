@@ -9,6 +9,9 @@ public struct SamplePageView: View {
     
     public var body: some View {
         ZStack {
+            Rectangle()
+                .fill(.clear)
+                .border(Color.red, width: 5)
             Circle()
                 .inset(by: 2.5)
                 .stroke(Color.blue, lineWidth: 5)
@@ -19,10 +22,6 @@ public struct SamplePageView: View {
             .padding()
             .background(Color.orange)
         }
-        .background(
-            Color.clear
-                .border(Color.red, width: 5)
-        )
     }
 }
 
