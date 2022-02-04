@@ -1,8 +1,16 @@
 import SwiftUI
 
 public extension View {
+    func image(size: CGSize) -> UIImage {
+        DispatchQueue.main.sync {
+            self
+                .uiView(size: size)
+                .image
+        }
+    }
+
     // Must be called on the main thread.
-    func uiView(size: CGSize) -> UIView {
+    private func uiView(size: CGSize) -> UIView {
         let frame = CGRect(origin: CGPoint(x: 50, y: 50), size: size)
         let window = UIWindow(frame: frame)
         let hosting = UIHostingController(rootView: self)
@@ -12,39 +20,12 @@ public extension View {
         window.makeKeyAndVisible()
         return hosting.view
     }
-    
-    func image(size: CGSize) -> UIImage {
-        self
-            .uiView(size: size)
-            .image
-    }
-    
-//    func pdfPage(size: CGSize) -> CGPDFPage {
-//        self
-//            .uiView(size: size)
-//            .pdfPage
-//    }
 }
 
 public extension UIView {
-    var image: UIImage {
-        UIGraphicsBeginImageContextWithOptions(bounds.size, true, 2)
-        defer { UIGraphicsEndImageContext() }
-        let context = UIGraphicsGetCurrentContext()!
-        layer.render(in: context)
-        return UIGraphicsGetImageFromCurrentImageContext()!
+    fileprivate var image: UIImage {
+        return UIGraphicsImageRenderer(bounds: bounds).image {
+            layer.render(in: $0.cgContext)
+        }
     }
-    
-//    var pdfPage: CGPDFPage {
-//        let pdfRenderer = UIGraphicsPDFRenderer(bounds: bounds)
-//
-//        let pdfData = pdfRenderer.pdfData { rendererContext in
-//            rendererContext.beginPage()
-//            let cgContext = rendererContext.cgContext
-//            layer.render(in: cgContext)
-//        }
-//        let dataProvider = CGDataProvider(data: pdfData as CFData)!
-//        let pdfDoc = CGPDFDocument(dataProvider)!
-//        return pdfDoc.page(at: 1)!
-//    }
 }

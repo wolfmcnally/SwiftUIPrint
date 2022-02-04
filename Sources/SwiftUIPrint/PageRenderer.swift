@@ -38,13 +38,11 @@ public class PageRenderer<Page>: UIPrintPageRenderer where Page: View {
             frame = paperRect
         }
         
-        let image = DispatchQueue.main.sync {
-            pages[pageIndex]
-                .background(.white)
-                .environment(\.colorScheme, .light)
-                .frame(width: frame.width, height: frame.height)
-                .image(size: frame.size)
-        }
+        let image = pages[pageIndex]
+            .background(.white)
+            .environment(\.colorScheme, .light)
+            .frame(width: frame.width, height: frame.height)
+            .image(size: frame.size)
         context.draw(image.cgImage!, in: frame)
         
 //        drawCrossedBox(in: context, frame: paperRect, color: .red)
