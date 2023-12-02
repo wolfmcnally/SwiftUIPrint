@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "SwiftUIPrint",
+        "repositoryURL": "https://github.com/wolfmcnally/SwiftUIPrint.git",
+        "state": {
+          "branch": null,
+          "revision": "5ae2754de4a9e8bfae0f76097bfba5dae0d5ea8f",
+          "version": "1.0.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

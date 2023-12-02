@@ -4,7 +4,7 @@
 
 ### by Wolf McNally
 
-The full code for the demo of this package is in [SwiftUIPrintDemo](https://github.com/wolfmcnally/SwiftUIPrintDemo).
+The full code for the demo of this package is in [SwiftUIPrintDemo](./SwiftUIPrintDemo).
 
 Let's say you have a SwiftUI `View`. It's adaptive to its container size and displays correctly under dark mode or light mode:
 
