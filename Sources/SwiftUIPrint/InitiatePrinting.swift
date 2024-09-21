@@ -18,6 +18,7 @@ public enum PrintingResult {
     case userCancelled
 }
 
+@MainActor
 public func presentPrintInteractionController<Page>(pages: [Page], jobName: String? = nil, fitting: PageFitting = .fitToPrintableRect, completion: ((PrintingResult) -> Void)? = nil) where Page: View {
     let printController = UIPrintInteractionController()
     let printInfo = UIPrintInfo.printInfo()
@@ -41,6 +42,7 @@ public func presentPrintInteractionController<Page>(pages: [Page], jobName: Stri
     }
 }
 
+@MainActor
 public func presentPrintInteractionController<Page>(page: Page, fitting: PageFitting = .fitToPrintableRect, completion: ((PrintingResult) -> Void)? = nil) where Page: View {
     presentPrintInteractionController(pages: [page], fitting: fitting, completion: completion)
 }

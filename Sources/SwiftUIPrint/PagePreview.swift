@@ -1,14 +1,10 @@
 import SwiftUI
 
 struct ViewSize: PreferenceKey {
-    static var defaultValue: CGSize?
+    static let defaultValue: CGSize? = nil
     
     static func reduce(value: inout CGSize?, nextValue: () -> CGSize?) {
         value = nextValue()
-        print("value: \(String(describing: value))")
-        //            let n = nextValue()
-        //            guard let next = n else { return }
-        //            value = next
     }
 }
 

@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "SwiftUIPrint",
     platforms: [
-        .iOS(.v15), .macCatalyst(.v15)
+        .iOS(.v17), .macCatalyst(.v17)
     ],
     products: [
         .library(
